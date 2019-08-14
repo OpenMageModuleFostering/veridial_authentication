@@ -1,0 +1,277 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * DISCLAIMER
+ *
+ * Edit this file at your own risk, any adjustments made may prevent
+ * the extension from working correctly and/or cause security issues.
+ *
+ * @category   Veridial
+ * @package    Liquid11_Veridial
+ * @copyright  Copyright (c) Veridial <https://www.veridial.co.uk/>
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Veridial frontend page
+ *
+ * @category   Veridial
+ * @package    Liquid11_Veridial
+ * @author     Veridial <https://www.veridial.co.uk/>
+ */
+    $checkIfCustomer = $this->getVeridialCustomer();
+    $checkIfAdmin = $this->getVeridialAdmin();
+    $adminID = Mage::getModel('core/cookie')->get('admin_id');
+
+    if($checkIfAdmin){
+        Mage::getModel('core/cookie')->delete('logintype');
+        Mage::getModel('core/cookie')->set('logintype', 'admin');
+
+        // Load admin details
+        $loginUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_WEB).'admin';
+        $veridial_methods = $this->getVeridialAdminMethod();
+        $methods_array = explode(',', $veridial_methods);
+
+        $admin = Mage::getModel('admin/user')->load($adminID);
+        $adminName = $admin->getName();
+        $veridialEmail = $admin->getEmail();
+        $veridialMobile = $admin->getVeridialMobile();
+        $veridialLandline = $admin->getVeridialLandline();
+    } else {
+        $customerID = Mage::getModel('core/cookie')->get('userID');
+        //$customer = Mage::getModel('customer/customer')->load($customerID);
+        $customer = Mage::getSingleton('customer/session')->getCustomer();
+        $loginUrl = Mage::getUrl('customer/account/login');
+        $veridial_methods = $this->getVeridialCustomerMethod();
+        $methods_array = explode(',', $veridial_methods);
+        $veridialLandline = $customer->getLandline();
+        $veridialMobile = $customer->getMobile();
+        $veridialEmail = $customer->getEmail();
+    }
+    Mage::getModel('core/cookie')->delete('2FA');
+
+    Mage::getModel('core/cookie')->set('2FA', 'pending', '0', '/');
+?>
+<div class="title-page">
+    <?php if($checkIfCustomer || $checkIfAdmin): ?>
+        <?php if($checkIfAdmin): ?>
+            <h1>Hello, <?php echo $adminName; ?></h1>
+            <p><?php echo Mage::app()->getStore()->getFrontendName(); ?> has chosen to use <a href="https://www.veridial.co.uk/" target="_blank" title="Two Factor Authentication | Identity Verification | API | VerIDial">Veridial Two Factor Authentication</a> to improve security and to keep your account &amp; information safe.<br>Please follow the instructions below to continue to your Administration dashboard.</p>
+        <?php else: ?>
+            <h1>Hello, <?php echo $customer->getName(); ?></h1>
+            <p><?php echo Mage::app()->getStore()->getFrontendName(); ?> has chosen to use <a href="https://www.veridial.co.uk/" target="_blank" title="Two Factor Authentication | Identity Verification | API | VerIDial">Veridial Two Factor Authentication</a> to improve security and to keep your account &amp; information safe.<br>Please follow the instructions below to continue to your Customer account.</p>
+        <?php endif ?>
+
+        <form method="post" action="/">
+            <div class="col2-set">
+                <div class="col veridial-options">
+                    <h3 class="choose-method gap-top">Please choose your authorization method</h3>
+                    <a href="#" class="button button-secondary veridial-option mobile" data-method="app">
+                        <img src="<?php echo $this->getSkinUrl('images/liquid11/veridial/mobile.png'); ?>">
+                    </a>
+                    <a href="#" class="button button-secondary veridial-option" data-method="voice">
+                        <img src="<?php echo $this->getSkinUrl('images/liquid11/veridial/landline.png'); ?>">
+                    </a>
+                    <a href="#" class="button button-secondary veridial-option" data-method="email">
+                        <img src="<?php echo $this->getSkinUrl('images/liquid11/veridial/email.png'); ?>">
+                    </a>
+
+                        <div class="veridial-form">
+                            <ul class="form-list veridial-methods-form">
+                                <li class="veridial-landline"><br>
+                                    <?php if($veridialLandline): ?>
+                                        <input type="tel" name="veridialLandline" id="veridialLandline" class="input-text disabled" disabled="disabled" value="<?php echo $veridialLandline ?>">
+                                        <div class="buttons-set">
+                                            <p class="pull-left">Authorization methods available</p>
+                                            <?php
+                                            foreach($methods_array as $method){
+                                                switch ($method) {
+                                                    case 'sms':
+                                                        echo "<button type='submit' name='submitSms' data-method='sms' class='button veridial-submit sms disabled'><span><span>SMS</span></span></button>";
+                                                        break;
+                                                    case 'voice':
+                                                        echo "<button type='submit' name='submitVoice' data-method='voice' data-landline='true' class='button veridial-submit voice disabled'><span><span>Voice</span></span></button>";
+                                                        break;
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <label for="veridialLandline">We don't have a Landline Number for you, please Edit your Account Information to add one.</label>
+                                    <?php endif ?>
+                                </li>
+                                <li class="veridial-mobile"><br>
+                                    <?php if($veridialMobile): ?>
+                                        <label for="veridialMobile">The mobile number we have for you is</label>
+                                        <input type="tel" name="veridialMobile" id="veridialMobile" class="input-text disabled" disabled="disabled" value="<?php echo $veridialMobile ?>">
+                                        <div class="buttons-set">
+                                            <p class="pull-left">Authorization methods available</p>
+                                            <?php
+                                            foreach($methods_array as $method){
+                                                switch ($method) {
+                                                    case 'app':
+                                                        echo "<button type='submit' data-method='app' class='button veridial-submit app'><span><span>App</span></button>";
+                                                        break;
+                                                    case 'sms':
+                                                        echo "<button type='submit' name='submitSms' data-method='sms' class='button veridial-submit sms disabled'><span><span>SMS</span></span></button>";
+                                                        break;
+                                                    case 'voice':
+                                                        echo "<button type='submit' name='submitVoice' data-method='voice' class='button veridial-submit voice disabled'><span><span>Voice</span></span></button>";
+                                                        break;
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <label for="veridialMobile">We don't have a Mobile Number for you, please Edit your Account Information to add one.</label>
+                                    <?php endif ?>
+                                </li>
+                                <?php if($veridialMobile): ?>
+                                <?php endif ?>
+                                <li class="veridial-email"><br>
+                                    <label for="veridialEmail">The email address we have for you is</label>
+                                    <input type="tel" name="veridialEmail" id="veridialEmail" class="input-text disabled" disabled="disabled" value="<?php echo $veridialEmail ?>">
+                                    <div class="buttons-set">
+                                        <p class="pull-left">Authorization methods available</p>
+                                        <?php
+                                        foreach($methods_array as $method){
+                                            switch ($method) {
+                                                case 'email':
+                                                    echo "<button type='submit' name='submitEmail' data-method='email' class='button veridial-submit email'><span><span>Email</span></span></button>";
+                                                    break;
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                </li>
+                                <li class="veridial-response">
+
+                                </li>
+                            </ul>
+                    </div>
+                </div>
+            </div>
+           </form>
+           <form method="post" id="pin-submission-form" action="<?php echo $this->getVeridialBaseUrl(); ?>veridial_api/verify.php">
+               <div class="col2-set">
+                    <div class="col veridial-options">
+                        <h3 class="enter-pin gap-top">Please enter your PIN below</h3>
+                        <ul class="form-list pin-entry">
+                            <li>
+                                <input type="hidden" name="veridialToken" value="" id="veridialToken">
+
+                                <label for="email" class="required"><em>*</em>Enter your PIN</label>
+                                <div class="input-box">
+                                    <input type="text" name="veridialPin" value="" class="input-text" id="veridialPin" maxlength="4">
+                                    <div class="veridialPin validation-advice" id="veridialPin" name="veridialPin">Your PIN is incorrect.</div>
+                                </div>
+                                <div class="buttons-set">
+                                    <button type="submit" class="button veridial-option pin-submission"><span><span>Log In</span></span></button>
+                                    <!--<a href="#" class="button veridial-option pin-submission">Log In</a>-->
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+               </div>
+           </form>
+        <hr class="gap-top gap-bottom">
+        <?php if($checkIfAdmin): ?>
+            <button data-href="<?php echo $this->getVeridialBaseUrl().'veridial_api/logout.php'; ?>" class="link-button button button-secondary ">
+                <span><span>Cancel Authorization</span></span>
+            </button>
+        <?php else: ?>
+            <button data-href="<?php echo Mage::helper('customer')->getLogoutUrl(); ?>" class="link-button button button-secondary ">
+                <span><span>Cancel Authorization</span></span>
+            </button>
+        <?php endif ?>
+    <?php else: ?>
+        <h1>Sorry there seems to be a problem</h1>
+        <p>Please go back and <a href="<?php echo $loginUrl; ?>">log in</a> again</p>
+    <?php endif ?>
+</div>
+<script>
+    $j(function(){
+        $j('button.link-button').on('click', function(){
+            url = $j(this).data('href');
+            window.location = url;
+        });
+        $j('body').on('click', '.veridial-submit:not(.disabled)', function(e){
+            e.preventDefault();
+            var btnMethod = $j(this).data('method');
+            var isLandline = $j(this).data('landline');
+            var landlineNumber = $j('#veridialLandline').val();
+            var mobileNumber = $j('#veridialMobile').val();
+            var ajaxUrl ="<?php echo $this->getVeridialBaseUrl(); ?>veridial_api/apipost.php";
+            switch(btnMethod){
+                case 'email':
+                    postdata = { 'action': btnMethod, 'email': "<?php echo $veridialEmail; ?>" };
+                    console.log(postdata);
+                    break;
+                default:
+                    if(isLandline == 'true'){
+                        postdata = { 'action': btnMethod, 'number': landlineNumber };
+
+                    } else {
+                        postdata = { 'action': btnMethod, 'number': mobileNumber };
+                    }
+                    break;
+            }
+            $j.ajax({
+                url: ajaxUrl,
+                type: 'POST',
+                data: postdata,
+                error: function() {
+                    alert('Sorry, there was a problem processing your request. Please try again.');
+                },
+                success: function(data) {
+                    var response = JSON.parse(data);
+                    console.log(response);
+                    $j('.veridial-form li.veridial-mobile, .veridial-form li.veridial-landline,.veridial-form li.veridial-email').slideUp('fast');
+                    if(response.StatusCode == '4003'){
+                        $j('.veridial-form li.veridial-response').show().html('That telephone number has not been registered to a handset/smartphone running the VerIDial app. Please use one of the other verification methods to access your account instantly or take a moment to download the app for faster account access in the future.').wrapInner('<p style="font-size:13px;margin-top:10px">');
+                    } else {
+                        $j('.veridial-form li.veridial-response').show().html(response.StatusDescription).wrapInner('<p style="margin-top:10px">');
+                    }
+                    if(response.hasOwnProperty('Token')){
+                        $j('#veridialToken').val(response.Token);
+                        $j('.form-list.veridial-methods-form, .button-secondary.veridial-option, h3.choose-method').slideUp('fast');
+                        $j('.form-list.pin-entry, .enter-pin').slideDown('fast');
+                        $j('#veridialPin').focus();
+                    }
+                }
+            });
+        });
+        $j('body').on('click', '.pin-submission', function(e) {
+            e.preventDefault();
+            var pinNumber = $j('#veridialPin').val();
+            var veridialToken = $j('#veridialToken').val();
+            var pindata = { 'Pin': pinNumber, 'Token': veridialToken, 'verify': true };
+            console.log(pindata);
+            $j.ajax({
+                url: "<?php echo $this->getVeridialBaseUrl(); ?>veridial_api/apipost.php",
+                type: 'POST',
+                data: pindata,
+                error: function() {
+                    alert('Sorry, there was a problem processing your request. Please try again.');
+                },
+                success: function(data) {
+                    var response = JSON.parse(data);
+                    if(response.StatusCode == '1006'){
+                        $j('#pin-submission-form').submit();
+                    } else {
+                        $j('#veridialPin').addClass('validation-failed');
+                        $j('.veridialPin.validation-advice').show().html(response.StatusDescription);
+                    }
+                }
+            });
+        });
+    });
+</script>

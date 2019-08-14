@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * DISCLAIMER
+ *
+ * Edit this file at your own risk, any adjustments made may prevent
+ * the extension from working correctly and/or cause security issues.
+ *
+ * @category   Veridial
+ * @package    Liquid11_Veridial
+ * @copyright  Copyright (c) Veridial <https://www.veridial.co.uk/>
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Veridial frontend layout XML
+ *
+ * @category   Veridial
+ * @package    Liquid11_Veridial
+ * @author     Veridial <https://www.veridial.co.uk/>
+ */
+-->
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addJs"><script>liquid11/veridial/jquery-1.10.2.min.js</script></action>
+            <action method="addJs"><script>liquid11/veridial/noconflict.js</script></action>
+            <action method="addJs"><script>liquid11/veridial/veridial.js</script></action>
+        </reference>
+    </default>
+
+    <veridial_index_index>
+        <reference name="head">
+            <action method="addCss"><stylesheet>css/liquid11/veridial/veridial.css</stylesheet></action>
+        </reference>
+        <reference name="root">
+            <action method="setTemplate"><template>page/liquid11/veridial.phtml</template></action>
+        </reference>
+        <reference name="content">
+            <action method="setCacheLifetime"><s>null</s></action>
+            <block type="veridial/veridial" name="veridial" template="liquid11/veridial/veridial.phtml" />
+
+        </reference>
+
+    </veridial_index_index>
+
+    <!-- Override customer registration form to add new fields -->
+    <customer_account_create>
+        <reference name="customer_form_register">
+            <action method="setTemplate"><template>liquid11/veridial/persistent/customer/form/register.phtml</template></action>
+        </reference>
+    </customer_account_create>
+
+    <!-- Override customer edit account form to add new fields -->
+    <customer_account_edit>
+        <reference name="customer_edit">
+            <action method="setTemplate"><template>liquid11/veridial/persistent/customer/form/edit.phtml</template></action>
+        </reference>
+    </customer_account_edit>
+
+</layout>

@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Open Software License (OSL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/osl-3.0.php
+ *
+ * DISCLAIMER
+ *
+ * Edit this file at your own risk, any adjustments made may prevent
+ * the extension from working correctly and/or cause security issues.
+ *
+ * @category   Veridial
+ * @package    Liquid11_Veridial
+ * @copyright  Copyright (c) Veridial <https://www.veridial.co.uk/>
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
+/**
+ * Liquid11 Veridial module configuration
+ *
+ * @category   Veridial
+ * @package    Liquid11_Veridial
+ * @author     Veridial <https://www.veridial.co.uk/>
+ */
+-->
+<config>
+    <modules>
+        <Liquid11_Veridial>
+            <version>1.0.0</version>
+        </Liquid11_Veridial>
+    </modules>
+    <frontend>
+        <routers>
+            <customer>
+                <args>
+                    <modules>
+                        <Liquid11_Veridial before="Mage_Customer">Liquid11_Veridial</Liquid11_Veridial>
+                    </modules>
+                </args>
+            </customer>
+            <veridial>
+                <use>standard</use>
+                <args>
+                    <module>Liquid11_Veridial</module>
+                    <frontName>veridial-authentication</frontName>
+                </args>
+            </veridial>
+        </routers>
+        <layout>
+            <updates>
+                <veridial>
+                    <file>liquid11/veridial/veridial.xml</file>
+                </veridial>
+            </updates>
+        </layout>
+    </frontend>
+    <admin>
+        <routers>
+			<veridial>
+				<use>admin</use>
+				<args>
+					<module>Liquid11_Veridial</module>
+					<frontName>veridial-authentication</frontName>
+				</args>
+			</veridial>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <Liquid11_Veridial_Adminhtml before="Mage_Adminhtml">Liquid11_Veridial_Adminhtml</Liquid11_Veridial_Adminhtml>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <adminhtml>
+		<acl>
+			<resources>
+				<all>
+					<title>Allow Everything</title>
+				</all>
+				<admin>
+					<children>
+						<Liquid11_Veridial>
+							<title>Veridial Module</title>
+							<sort_order>10</sort_order>
+						</Liquid11_Veridial>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+		<layout>
+			<updates>
+				<veridial>
+					<file>liquid11/veridial/veridialadmin.xml</file>
+				</veridial>
+			</updates>
+		</layout>
+    </adminhtml>
+    <global>
+        <models>
+            <veridial>
+                <class>Liquid11_Veridial_Model</class>
+                <resourceModel>veridial_mysql4</resourceModel>
+            </veridial>
+            <adminhtml>
+                <rewrite>
+                    <session>Liquid11_Veridial_Model_Adminhtml_Session</session>
+                </rewrite>
+            </adminhtml>
+            <customer>
+                <rewrite>
+                    <session>Liquid11_Veridial_Model_Session</session>
+                </rewrite>
+            </customer>
+        </models>
+        <blocks>
+            <veridial>
+                <class>Liquid11_Veridial_Block</class>
+            </veridial>
+            <adminhtml>
+                <rewrite>
+                    <permissions_user_edit_tab_main>Liquid11_Veridial_Block_Adminhtml_Permissions_User_Edit_Tab_Main</permissions_user_edit_tab_main>
+                    <permissions_user_grid>Liquid11_Veridial_Block_Adminhtml_Permissions_User_Grid</permissions_user_grid>
+                </rewrite>
+            </adminhtml>
+        </blocks>
+        <helpers>
+            <veridial>
+                <class>Liquid11_Veridial_Helper</class>
+            </veridial>
+        </helpers>
+        <resources>
+            <veridial_setup>
+                <setup>
+                    <module>Liquid11_Veridial</module>
+                    <class>Mage_Customer_Model_Entity_Setup</class>
+                </setup>
+                <connection>
+                    <use>core_setup</use>
+                </connection>
+            </veridial_setup>
+            <veridial_write>
+                <connection>
+                    <use>core_write</use>
+                </connection>
+            </veridial_write>
+            <veridial_read>
+                <connection>
+                    <use>core_read</use>
+                </connection>
+            </veridial_read>
+        </resources>
+    </global>
+	<default>
+		<veridial>
+			<settings>
+				<is_enabled>0</is_enabled>
+                <use_admin>1</use_admin>
+                <use_customer>1</use_customer>
+                <installation></installation>
+                <api></api>
+                <billing></billing>
+                <customer_method>email</customer_method>
+                <admin_method>email</admin_method>
+			</settings>
+			<link_options>
+				<show_footerlink>1</show_footerlink>
+				<show_toplink>1</show_toplink>
+			</link_options>
+		</veridial>
+	</default>
+</config>

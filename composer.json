@@ -1,0 +1,16 @@
+{
+    "name": "OpenMageModuleFostering/veridial_authentication",
+    "type": "magento-module",
+    "license": "Open-Software-License-(OSL)",
+    "homepage": "",
+    "description": "Veridial provides 2 Factor Authentication for Magento Admins and Customer logins",
+    "authors": [
+    {
+        "name": "Christopher Thrower",
+        "email": "chris.thrower@liquid11.co.uk"
+    }
+],
+    "suggest": {
+        "magento-hackathon/magento-composer-installer": "*"
+    }
+}
