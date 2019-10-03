@@ -1,7 +1,7 @@
 {
-    "name": "OpenMageModuleFostering\/veridial_authentication",
+    "name": "openmage-module-fostering\/veridial_authentication",
     "type": "magento-module",
-    "license": "Open-Software-License-(OSL)",
+    "license": "OSL-3.0",
     "homepage": "",
     "description": "Veridial provides 2 Factor Authentication for Magento Admins and Customer logins",
     "authors": [
